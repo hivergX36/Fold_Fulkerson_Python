@@ -1,18 +1,22 @@
 from collections import defaultdict
 import re 
 
-class BellmanFord:
+class Djikstra:
 
     def __init__(self):
+        self.history = []
         self.NbVertices = 0
         self.NbEdges = 0
         self.adjacency_list = {}
         self.adjacency_Matrix = []
         self.path = []
         self.cost = []
-        self.negative_cycle = False  
         self.visited = []
-        
+        self.path = []
+        self.min_cost = 0
+        self.start = 0
+        self.sink = 0
+        self.increment_distory = 0
     
             
     def parse_graph(self,text):
@@ -23,9 +27,14 @@ class BellmanFord:
         lines = [line.strip() for line in lines if line.strip() != "''"]
         lines = [[int(x) for x in lines[i].split(' ')] for i in range(len(lines)) if lines[i] != ""]
         self.NbVertices = lines[0][0]
+        self.start = lines[0][1]
+        self.sink = lines[1][len(lines)-1]
+        print("Start:", self.start)
+        print("Sink:", self.sink)
         self.NbEdges = len(lines) - 1
         self.adjacency_list = defaultdict(list)
         self.adjacency_Matrix = [[0 for i in range(self.NbVertices)] for j in range(self.NbVertices)]
+        self.visited = [False for i in range(self.NbVertices)]
         for i in range(1, len(lines)):
             u, v, w = lines[i]
             self.adjacency_list[u].append((v, w))
@@ -41,34 +50,49 @@ class BellmanFord:
         for row in self.adjacency_Matrix:
             print(row)
             
+    def bfs_FoldFulkerson(self):
+        
+            
             
     def resolve(self):
-        cost = 0 
+        current_vertex = 0
+        prec = 0 
+        cost_succ = 0 
+        cost_prec = 0
         self.path = [None for i in range(self.NbVertices)]
         self.cost = [float('inf') for i in range(self.NbVertices)]
-        self.cost[0] = 0  # Assuming the source vertex is 0
-        for i in range(self.NbVertices - 1):
-            for j in range(self.NbVertices):
-                vertex = j 
-                for succ, weight in self.adjacency_list[vertex]:
-                    cost = self.cost[succ]
-                    print(f"Checking edge {vertex} -> {succ} with weight {weight}")
-                    if self.cost[vertex] + weight < cost:
-                        cost = self.cost[vertex] + weight
-                        print(f"Updating cost for vertex {succ} to {cost}")
-                        self.path[succ] = vertex
-                        self.cost[succ] = cost
-                        
-                        
-        # Check for negative weight cycles
-        for j in range(self.NbVertices):
-            vertex = j 
+        self.cost[0] = 0
+        fifo = [0]
+        while len(fifo) > 0:
+            vertex = fifo.pop()
+            self.visited[vertex] = True
+            print("Processing vertex:", vertex)
+            print("Current cost:", cost_succ)
             for succ, weight in self.adjacency_list[vertex]:
-                if self.cost[vertex] + weight < self.cost[succ]:
-                    print(f"Negative cycle detected on edge {vertex} -> {succ} with weight {weight}")
-                    self.negative_cycle = True
-                    return
+                if self.visited[succ] == True:
+                    break
+                fifo.append(succ)
+                cost_succ = self.cost[succ]
+                cost_prec = self.cost[vertex]
+                print(f"Checking edge {vertex} -> {succ} with weight {weight}")
+                if cost_prec + weight  < cost_succ:
+                    cost_succ = cost_prec + weight
+                    print(f"Updating cost for vertex {succ} to {cost_succ}")
+                    self.path[succ] = vertex
+                    self.cost[succ] = cost_succ
+                    
+    def calculate_shortest_path(self):
+        prec = self.path[-1]
+        while prec is not None:
+            self.shortest_path.append(prec)
+            current_vertex = self.path[prec]
+            self.shortest_path.reverse()
+            self.min_cost = sum(self.cost[i] for i in self.shortest_path)
+
+
 
     def display_path(self):
-        print("Path:", self.path)
+        print("path predecessors:", self.path)
+        print("Path:", self.shortest_path)
         print("Cost:", self.cost)
+        print("Minimum cost:", self.min_cost)

@@ -1,8 +1,4 @@
-import re 
-import BellmanFord 
-
-BellmanFord = BellmanFord.BellmanFord()
-BellmanFord.parse_graph("data02.txt")
-BellmanFord.display_graph()
-BellmanFord.resolve()
-BellmanFord.display_path() 
+urls_d = {}
+urls_d["1"] = 2
+urls_d["2"] = 3
+print(urls_d)
