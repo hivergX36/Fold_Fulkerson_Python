@@ -1,4 +1,8 @@
-urls_d = {}
-urls_d["1"] = 2
-urls_d["2"] = 3
-print(urls_d)
+import fold_fulkerson
+import re 
+
+fold_fulkerson = fold_fulkerson.Fold_Fulkerson()
+fold_fulkerson.parse_graph("data2.txt")
+fold_fulkerson.display_graph()
+fold_fulkerson.Fold_Fulkerson()
+fold_fulkerson.display_solution()

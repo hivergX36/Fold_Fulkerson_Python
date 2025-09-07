@@ -1,7 +1,7 @@
 from collections import defaultdict
 import re 
 
-class Djikstra:
+class Fold_Fulkerson:
 
     def __init__(self):
         self.history = []
@@ -10,15 +10,10 @@ class Djikstra:
         self.adjacency_list = {}
         self.adjacency_Matrix = []
         self.path = []
-        self.cost = []
-        self.visited = []
-        self.path = []
-        self.min_cost = 0
-        self.start = 0
+        self.source = 0
         self.sink = 0
-        self.increment_distory = 0
-    
-            
+        self.max_flow = 0
+
     def parse_graph(self,text):
         fichier = open(text, "r",encoding="utf8")
         lines = fichier.readlines()
@@ -27,8 +22,8 @@ class Djikstra:
         lines = [line.strip() for line in lines if line.strip() != "''"]
         lines = [[int(x) for x in lines[i].split(' ')] for i in range(len(lines)) if lines[i] != ""]
         self.NbVertices = lines[0][0]
-        self.start = lines[0][1]
-        self.sink = lines[1][len(lines)-1]
+        self.start = lines[1][0]
+        self.sink = lines[len(lines)-1][1]
         print("Start:", self.start)
         print("Sink:", self.sink)
         self.NbEdges = len(lines) - 1
@@ -49,50 +44,52 @@ class Djikstra:
         print("Adjacency Matrix:")
         for row in self.adjacency_Matrix:
             print(row)
-            
-    def bfs_FoldFulkerson(self):
+
+    def Dfs(self, visited,parent, s, sink):
+        visited[s] = True
+        if s == sink:
+            return True
+        for v in range(self.NbVertices):
+            w = self.adjacency_Matrix[s][v]
+            if visited[v] == False and w > 0:
+                parent[v] = s
+                if self.Dfs(visited, parent, v, sink):
+                    return True
+        return False
+    
+
+
+
+    def Fold_Fulkerson(self):
+        parent = {}
+        self.max_flow = 0
+
+        while True:
+            visited = {v: False for v in range(self.NbVertices)}
+            parent = {}
+            if not self.Dfs(visited, parent, self.start, self.sink):
+                break
+            flow = float('inf')
+            s = self.sink
+            while s != self.start:
+                flow = min(flow, self.adjacency_Matrix[parent[s]][s])
+                s = parent[s]
+            self.max_flow += flow
+            v = self.sink
+            while v != self.start:
+                u = parent[v]
+                self.adjacency_Matrix[u][v] -= flow
+                self.adjacency_Matrix[v][u] += flow
+                v = parent[v]
+
+
+
+    def display_solution(self): 
+        print("Max Flow:", self.max_flow)
+        print("Residual Graph:")
+        for row in self.adjacency_Matrix:
+            print(row)
+        return self.max_flow, self.adjacency_Matrix
         
-            
-            
-    def resolve(self):
-        current_vertex = 0
-        prec = 0 
-        cost_succ = 0 
-        cost_prec = 0
-        self.path = [None for i in range(self.NbVertices)]
-        self.cost = [float('inf') for i in range(self.NbVertices)]
-        self.cost[0] = 0
-        fifo = [0]
-        while len(fifo) > 0:
-            vertex = fifo.pop()
-            self.visited[vertex] = True
-            print("Processing vertex:", vertex)
-            print("Current cost:", cost_succ)
-            for succ, weight in self.adjacency_list[vertex]:
-                if self.visited[succ] == True:
-                    break
-                fifo.append(succ)
-                cost_succ = self.cost[succ]
-                cost_prec = self.cost[vertex]
-                print(f"Checking edge {vertex} -> {succ} with weight {weight}")
-                if cost_prec + weight  < cost_succ:
-                    cost_succ = cost_prec + weight
-                    print(f"Updating cost for vertex {succ} to {cost_succ}")
-                    self.path[succ] = vertex
-                    self.cost[succ] = cost_succ
-                    
-    def calculate_shortest_path(self):
-        prec = self.path[-1]
-        while prec is not None:
-            self.shortest_path.append(prec)
-            current_vertex = self.path[prec]
-            self.shortest_path.reverse()
-            self.min_cost = sum(self.cost[i] for i in self.shortest_path)
-
-
-
-    def display_path(self):
-        print("path predecessors:", self.path)
-        print("Path:", self.shortest_path)
-        print("Cost:", self.cost)
-        print("Minimum cost:", self.min_cost)
+        
+       
